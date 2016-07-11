@@ -1,3 +1,27 @@
 <resources>
     <string name="app_name">Caller</string>
+
+    <!--Preferences-->
+    <!--Username-->
+    <string name="pref_key_username">Username</string>
+    <string name="pref_username_default">user</string>
+
+    <!--Preferences-->
+    <!--Temp user for debug-->
+    <string name="pref_temp_user2name">[temp]user2</string>
+    <string name="pref_temp_user2name_default">user2</string>
+
+    <!--Preferences-->
+    <!--Visibility-->
+    <string name="pref_label_isVisible">Are you visible to callers?</string>
+    <string name="pref_key_isVisible">isVisible</string>
+    <string name="pref_isVisible_default">true</string>
+    <string name="pref_isVisible_option_false">No</string>
+    <string name="pref_isVisible_option_true">Yes</string>
+    <string name="pref_isVisible_val_true">true</string>
+    <string name="pref_isVisible_val_false">false</string>
+
+    <!--Settings-->
+    <string name="action_settings">Settings</string>
+
 </resources>
