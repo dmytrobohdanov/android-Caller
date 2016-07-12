@@ -10,6 +10,7 @@ import org.webrtc.MediaConstraints;
 import org.webrtc.MediaStream;
 import org.webrtc.PeerConnectionFactory;
 import org.webrtc.VideoCapturerAndroid;
+import org.webrtc.VideoRenderer;
 import org.webrtc.VideoRendererGui;
 import org.webrtc.VideoSource;
 import org.webrtc.VideoTrack;
@@ -52,10 +53,23 @@ public class Communicator {
 
         PeerConnectionFactory peerConnectionFactory = new PeerConnectionFactory();
 
+        VideoRendererGui.setView(videoView, new Runnable() {
+            @Override
+            public void run() {
+            }
+        });
 
         MediaStream mediaStream = getLocalMediaStream(peerConnectionFactory, INITIALIZE_AUDIO, INITIALIZE_VIDEO);
 
-
+        try {
+            VideoRenderer renderer = VideoRendererGui.createGui(0, 0, 100, 100, VideoRendererGui.ScalingType.SCALE_ASPECT_FIT, false);
+            mediaStream.videoTracks.getFirst().addRenderer(renderer);
+        } catch (Exception e) {
+            String s = e.getMessage();
+            Log.e(LOG_TAG, s);
+        }
+//        PeerConnection peerConnection = peerConnectionFactory.createPeerConnection();
+//        peerConnection.createOffer(this, );
     }
 
 
