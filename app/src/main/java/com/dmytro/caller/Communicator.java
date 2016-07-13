@@ -34,6 +34,7 @@ public class Communicator {
     private static Communicator instance;
     private GLSurfaceView videoView;
     private MediaStream localMediaStream;
+    private PeerConnectionFactory peerConnectionFactory;
 
     /**
      * Constructor
@@ -52,7 +53,7 @@ public class Communicator {
             Log.e(LOG_TAG, "Android globals are not initialized");
         }
 
-        PeerConnectionFactory peerConnectionFactory = new PeerConnectionFactory();
+        peerConnectionFactory = new PeerConnectionFactory();
 
         localMediaStream = initializeLocalMediaStream(peerConnectionFactory, INITIALIZE_AUDIO, INITIALIZE_VIDEO);
 
@@ -61,15 +62,42 @@ public class Communicator {
 //        peerConnection.createOffer(this, );
     }
 
-    public MediaStream getLocalMediaStream(){
+    public static Communicator getInstance(Activity activity) {
+        if (instance == null) {
+            instance = new Communicator(activity);
+        }
+
+        return instance;
+    }
+
+//    public void makeCall() {
+//
+//        PeerConnection peerConnection = peerConnectionFactory.createPeerConnection(
+//                configuration,
+//                constraints,
+//                peerConnectionObserver);
+//    }
+
+    /**
+     * @return local media stream
+     */
+    public MediaStream getLocalMediaStream() {
+        //todo handle non-initialized local media stream
         return localMediaStream;
     }
 
-    public void visualizeMediaStream (GLSurfaceView videoView, MediaStream mediaStream){
+    /**
+     * Visualizing media stream in videoView
+     *
+     * @param videoView   holder of stream
+     * @param mediaStream needed to be shown
+     */
+    public void visualizeMediaStream(GLSurfaceView videoView, MediaStream mediaStream) {
         //todo find out what about audio stream playing
         VideoRendererGui.setView(videoView, new Runnable() {
             @Override
             public void run() {
+                //callback
             }
         });
 
@@ -82,56 +110,46 @@ public class Communicator {
         }
     }
 
-    public static Communicator getInstance(Activity activity) {
-        if (instance == null) {
-            instance = new Communicator(activity);
-        }
-
-        return instance;
-    }
-
-
-
-
     /**
      * Creates local media stream
      */
     public MediaStream initializeLocalMediaStream(PeerConnectionFactory peerConnectionFactory,
                                                   boolean initialize_audio, boolean initialize_video) {
         int defaultCameraID = 0;
-        return initializeLocalMediaStream(peerConnectionFactory, initialize_audio,initialize_video, defaultCameraID);
+        return initializeLocalMediaStream(peerConnectionFactory, initialize_audio, initialize_video, defaultCameraID);
     }
 
     /**
-     *  Creates local media stream
-     *  with specified camera name
-     *  @param cameraName could be specified by static constants in Communicator class
-     *                    can be: Communicator.FRONT_CAMERA and Communicator.BACK_CAMERA
+     * Creates local media stream
+     * with specified camera name
+     *
+     * @param cameraName could be specified by static constants in Communicator class
+     *                   can be: Communicator.FRONT_CAMERA and Communicator.BACK_CAMERA
      */
     public MediaStream initializeLocalMediaStream(PeerConnectionFactory peerConnectionFactory,
                                                   boolean initialize_audio, boolean initialize_video, String cameraName) {
 
-        if(!cameraName.equals(Communicator.FRONT_CAMERA) || !cameraName.equals(Communicator.BACK_CAMERA)){
+        if (!cameraName.equals(Communicator.FRONT_CAMERA) || !cameraName.equals(Communicator.BACK_CAMERA)) {
             //todo change to exception sometime
             Log.e(LOG_TAG, "Wrong camera name have passed. Using default camera ID value...");
             return initializeLocalMediaStream(peerConnectionFactory, initialize_audio, initialize_video);
         }
 
-        int numberOfCameras= VideoCapturerAndroid.getDeviceCount();
+        int numberOfCameras = VideoCapturerAndroid.getDeviceCount();
 
         //looking for ID of specified camera name
         //setting default ID value
         int defaultIDValue = -1;
         int cameraID = defaultIDValue;
-        for(int i = 0; i < numberOfCameras; i++){
+        for (int i = 0; i < numberOfCameras; i++) {
             String camera = VideoCapturerAndroid.getDeviceName(i);
-            if(camera.equals(cameraName)){
+            if (camera.equals(cameraName)) {
                 cameraID = i;
                 break;
             }
         }
         //if there is no such camera - using default ID
-        if(cameraID == defaultIDValue){
+        if (cameraID == defaultIDValue) {
             return initializeLocalMediaStream(peerConnectionFactory, initialize_audio, initialize_video);
         }
         return initializeLocalMediaStream(peerConnectionFactory, initialize_audio, initialize_video, cameraID);
@@ -146,7 +164,7 @@ public class Communicator {
         MediaStream localMediaStream = peerConnectionFactory.createLocalMediaStream(LOCAL_MEDIA_STREAM_ID);
 
         //forming audio stream
-        if(initialize_audio){
+        if (initialize_audio) {
             MediaConstraints audioConstraints = new MediaConstraints();
             AudioSource audioSource =
                     peerConnectionFactory.createAudioSource(audioConstraints);
@@ -156,10 +174,10 @@ public class Communicator {
         }
 
         //forming video stream
-        if(initialize_video){
+        if (initialize_video) {
             //checking availability of camera with specified ID
             //if there is no such camera we can not form video stream
-            if(cameraID < VideoCapturerAndroid.getDeviceCount()){
+            if (cameraID < VideoCapturerAndroid.getDeviceCount()) {
                 VideoCapturerAndroid capturer = VideoCapturerAndroid.create(
                         VideoCapturerAndroid.getDeviceName(cameraID));
                 MediaConstraints videoConstraints = new MediaConstraints();
