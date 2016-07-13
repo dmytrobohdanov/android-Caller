@@ -8,12 +8,15 @@ import org.webrtc.AudioSource;
 import org.webrtc.AudioTrack;
 import org.webrtc.MediaConstraints;
 import org.webrtc.MediaStream;
+import org.webrtc.PeerConnection;
 import org.webrtc.PeerConnectionFactory;
 import org.webrtc.VideoCapturerAndroid;
 import org.webrtc.VideoRenderer;
 import org.webrtc.VideoRendererGui;
 import org.webrtc.VideoSource;
 import org.webrtc.VideoTrack;
+
+import java.util.LinkedList;
 
 /**
  * Responsible for WebRTC communication
@@ -35,6 +38,9 @@ public class Communicator {
     private GLSurfaceView videoView;
     private MediaStream localMediaStream;
     private PeerConnectionFactory peerConnectionFactory;
+    private PeerConnection peerConnection;
+    private ConnectionsObserver peerConnectionObserver;
+
 
     /**
      * Constructor
@@ -57,6 +63,9 @@ public class Communicator {
 
         localMediaStream = initializeLocalMediaStream(peerConnectionFactory, INITIALIZE_AUDIO, INITIALIZE_VIDEO);
 
+        peerConnectionObserver = ConnectionsObserver.getInstance();
+
+        this.prepareToMakeCall();
 
 //        PeerConnection peerConnection = peerConnectionFactory.createPeerConnection();
 //        peerConnection.createOffer(this, );
@@ -70,13 +79,26 @@ public class Communicator {
         return instance;
     }
 
-//    public void makeCall() {
-//
-//        PeerConnection peerConnection = peerConnectionFactory.createPeerConnection(
-//                configuration,
-//                constraints,
-//                peerConnectionObserver);
-//    }
+    public void prepareToMakeCall() {
+        //setting media constrains
+        MediaConstraints pcConstraints = new MediaConstraints();
+        pcConstraints.mandatory.add(new MediaConstraints.KeyValuePair("offerToRecieveAudio", "true"));
+        pcConstraints.mandatory.add(new MediaConstraints.KeyValuePair("OfferToReceiveVideo", "true"));
+        pcConstraints.optional.add(new MediaConstraints.KeyValuePair("RtpDataChannels", "true"));
+        pcConstraints.optional.add(new MediaConstraints.KeyValuePair("DtlsSrtpKeyAgreement", "true"));
+
+        //creating list of ice-servers
+        LinkedList<PeerConnection.IceServer> iceServers = new LinkedList<>();
+        iceServers.add(new PeerConnection.IceServer("stun:stun.l.google.com:19302"));
+        PeerConnection.RTCConfiguration configuration = new PeerConnection.RTCConfiguration(iceServers);
+
+        peerConnection = peerConnectionFactory.createPeerConnection(
+                configuration,
+                pcConstraints,
+                peerConnectionObserver);
+
+        
+    }
 
     /**
      * @return local media stream
