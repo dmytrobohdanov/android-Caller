@@ -33,6 +33,7 @@ public class Communicator {
 
     private static Communicator instance;
     private GLSurfaceView videoView;
+    private MediaStream localMediaStream;
 
     /**
      * Constructor
@@ -53,13 +54,24 @@ public class Communicator {
 
         PeerConnectionFactory peerConnectionFactory = new PeerConnectionFactory();
 
+        localMediaStream = initializeLocalMediaStream(peerConnectionFactory, INITIALIZE_AUDIO, INITIALIZE_VIDEO);
+
+
+//        PeerConnection peerConnection = peerConnectionFactory.createPeerConnection();
+//        peerConnection.createOffer(this, );
+    }
+
+    public MediaStream getLocalMediaStream(){
+        return localMediaStream;
+    }
+
+    public void visualizeMediaStream (GLSurfaceView videoView, MediaStream mediaStream){
+        //todo find out what about audio stream playing
         VideoRendererGui.setView(videoView, new Runnable() {
             @Override
             public void run() {
             }
         });
-
-        MediaStream mediaStream = getLocalMediaStream(peerConnectionFactory, INITIALIZE_AUDIO, INITIALIZE_VIDEO);
 
         try {
             VideoRenderer renderer = VideoRendererGui.createGui(0, 0, 100, 100, VideoRendererGui.ScalingType.SCALE_ASPECT_FIT, false);
@@ -68,11 +80,7 @@ public class Communicator {
             String s = e.getMessage();
             Log.e(LOG_TAG, s);
         }
-//        PeerConnection peerConnection = peerConnectionFactory.createPeerConnection();
-//        peerConnection.createOffer(this, );
     }
-
-
 
     public static Communicator getInstance(Activity activity) {
         if (instance == null) {
@@ -82,13 +90,16 @@ public class Communicator {
         return instance;
     }
 
+
+
+
     /**
      * Creates local media stream
      */
-    public MediaStream getLocalMediaStream(PeerConnectionFactory peerConnectionFactory,
-                                           boolean initialize_audio, boolean initialize_video) {
+    public MediaStream initializeLocalMediaStream(PeerConnectionFactory peerConnectionFactory,
+                                                  boolean initialize_audio, boolean initialize_video) {
         int defaultCameraID = 0;
-        return getLocalMediaStream(peerConnectionFactory, initialize_audio,initialize_video, defaultCameraID);
+        return initializeLocalMediaStream(peerConnectionFactory, initialize_audio,initialize_video, defaultCameraID);
     }
 
     /**
@@ -97,13 +108,13 @@ public class Communicator {
      *  @param cameraName could be specified by static constants in Communicator class
      *                    can be: Communicator.FRONT_CAMERA and Communicator.BACK_CAMERA
      */
-    public MediaStream getLocalMediaStream(PeerConnectionFactory peerConnectionFactory,
-                                           boolean initialize_audio, boolean initialize_video, String cameraName) {
+    public MediaStream initializeLocalMediaStream(PeerConnectionFactory peerConnectionFactory,
+                                                  boolean initialize_audio, boolean initialize_video, String cameraName) {
 
         if(!cameraName.equals(Communicator.FRONT_CAMERA) || !cameraName.equals(Communicator.BACK_CAMERA)){
             //todo change to exception sometime
             Log.e(LOG_TAG, "Wrong camera name have passed. Using default camera ID value...");
-            return getLocalMediaStream(peerConnectionFactory, initialize_audio, initialize_video);
+            return initializeLocalMediaStream(peerConnectionFactory, initialize_audio, initialize_video);
         }
 
         int numberOfCameras= VideoCapturerAndroid.getDeviceCount();
@@ -121,17 +132,17 @@ public class Communicator {
         }
         //if there is no such camera - using default ID
         if(cameraID == defaultIDValue){
-            return getLocalMediaStream(peerConnectionFactory, initialize_audio, initialize_video);
+            return initializeLocalMediaStream(peerConnectionFactory, initialize_audio, initialize_video);
         }
-        return getLocalMediaStream(peerConnectionFactory, initialize_audio, initialize_video, cameraID);
+        return initializeLocalMediaStream(peerConnectionFactory, initialize_audio, initialize_video, cameraID);
     }
 
     /**
      * Creates local media stream
      * with specified camera id
      */
-    public MediaStream getLocalMediaStream(PeerConnectionFactory peerConnectionFactory,
-                                           boolean initialize_audio, boolean initialize_video, int cameraID) {
+    public MediaStream initializeLocalMediaStream(PeerConnectionFactory peerConnectionFactory,
+                                                  boolean initialize_audio, boolean initialize_video, int cameraID) {
         MediaStream localMediaStream = peerConnectionFactory.createLocalMediaStream(LOCAL_MEDIA_STREAM_ID);
 
         //forming audio stream

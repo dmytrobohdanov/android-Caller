@@ -1,6 +1,7 @@
 package com.dmytro.caller;
 
 import android.content.Intent;
+import android.opengl.GLSurfaceView;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
@@ -16,6 +17,11 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         Communicator communicator = Communicator.getInstance(this);
+
+        //visualizing local media stream
+        communicator.visualizeMediaStream((GLSurfaceView) this.findViewById(R.id.calleeView),
+                communicator.getLocalMediaStream());
+
 
 
     }
