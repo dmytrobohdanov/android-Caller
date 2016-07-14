@@ -92,12 +92,17 @@ public class Communicator {
         iceServers.add(new PeerConnection.IceServer("stun:stun.l.google.com:19302"));
         PeerConnection.RTCConfiguration configuration = new PeerConnection.RTCConfiguration(iceServers);
 
+        //initializing instance of PeerConnection class
         peerConnection = peerConnectionFactory.createPeerConnection(
                 configuration,
                 pcConstraints,
                 peerConnectionObserver);
 
-        
+        //adding local stream
+        peerConnection.addStream(localMediaStream);
+
+
+
     }
 
     /**
