@@ -6,6 +6,7 @@ import android.util.Log;
 
 import org.webrtc.AudioSource;
 import org.webrtc.AudioTrack;
+import org.webrtc.IceCandidate;
 import org.webrtc.MediaConstraints;
 import org.webrtc.MediaStream;
 import org.webrtc.PeerConnection;
@@ -40,6 +41,7 @@ public class Communicator {
     private PeerConnectionFactory peerConnectionFactory;
     private PeerConnection peerConnection;
     private ConnectionsObserver peerConnectionObserver;
+    private IceCandidate[] listOfUsers;
 
 
     /**
@@ -100,8 +102,6 @@ public class Communicator {
 
         //adding local stream
         peerConnection.addStream(localMediaStream);
-
-
 
     }
 
@@ -218,4 +218,16 @@ public class Communicator {
         return localMediaStream;
     }
 
+    public IceCandidate[] getListOfUsers() {
+        updateListOfUsers();
+        return listOfUsers;
+    }
+
+    private void updateListOfUsers() {
+        // TODO
+    }
+
+//    public void makeCall(IceCandidate iceCandidate) {
+//        peerConnection.createAnswer();
+//    }
 }

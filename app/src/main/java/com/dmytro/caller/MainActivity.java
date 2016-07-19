@@ -7,6 +7,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import org.webrtc.IceCandidate;
+
 
 public class MainActivity extends AppCompatActivity {
     private final String LOG_TAG = this.getClass().getSimpleName();
@@ -22,7 +24,9 @@ public class MainActivity extends AppCompatActivity {
         communicator.visualizeMediaStream((GLSurfaceView) this.findViewById(R.id.calleeView),
                 communicator.getLocalMediaStream());
 
+        IceCandidate[] iceCandidates = communicator.getListOfUsers();
 
+        communicator.makeCall(iceCandidates[0]); //todo rewrite this temp line
 
     }
 
