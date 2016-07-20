@@ -1,6 +1,7 @@
 package com.dmytro.caller;
 
 import android.app.Activity;
+import android.media.AudioManager;
 import android.opengl.GLSurfaceView;
 import android.util.Log;
 
@@ -42,6 +43,9 @@ public class Communicator {
     private PeerConnection peerConnection;
     private ConnectionsObserver peerConnectionObserver;
     private IceCandidate[] listOfUsers;
+    private MediaConstraints sdpMediaConstraints;
+
+    public AudioManager audioManager;
 
 
     /**
@@ -60,6 +64,17 @@ public class Communicator {
 
             Log.e(LOG_TAG, "Android globals are not initialized");
         }
+
+        //setting speakerphone on
+        audioManager = ((AudioManager) activity.getSystemService(activity.AUDIO_SERVICE));
+        @SuppressWarnings("deprecation")
+        boolean isWiredHeadsetOn = audioManager.isWiredHeadsetOn();
+        audioManager.setMode(isWiredHeadsetOn ? AudioManager.MODE_IN_CALL : AudioManager.MODE_IN_COMMUNICATION);
+        audioManager.setSpeakerphoneOn(!isWiredHeadsetOn);
+
+        sdpMediaConstraints = new MediaConstraints();
+        sdpMediaConstraints.mandatory.add(new MediaConstraints.KeyValuePair("OfferToReceiveAudio", "true"));
+        sdpMediaConstraints.mandatory.add(new MediaConstraints.KeyValuePair("OfferToReceiveVideo", "true"));
 
         peerConnectionFactory = new PeerConnectionFactory();
 
@@ -102,8 +117,7 @@ public class Communicator {
 
         //adding local stream
         peerConnection.addStream(localMediaStream);
-
-    }
+     }
 
     /**
      * @return local media stream
@@ -114,14 +128,14 @@ public class Communicator {
     }
 
     /**
-     * Visualizing media stream in videoView
+     * Visualizing media stream in videoHolderView
      *
-     * @param videoView   holder of stream
-     * @param mediaStream needed to be shown
+     * @param videoHolderView holder of stream
+     * @param mediaStream     needed to be shown
      */
-    public void visualizeMediaStream(GLSurfaceView videoView, MediaStream mediaStream) {
+    public void visualizeMediaStream(GLSurfaceView videoHolderView, MediaStream mediaStream) {
         //todo find out what about audio stream playing
-        VideoRendererGui.setView(videoView, new Runnable() {
+        VideoRendererGui.setView(videoHolderView, new Runnable() {
             @Override
             public void run() {
                 //callback
@@ -226,6 +240,16 @@ public class Communicator {
     private void updateListOfUsers() {
         // TODO
     }
+
+    //    /**
+    //     * Update params of call
+    //     * for example using when setting menu params are changed
+    //     */
+    //    public void updateCallSettings(boolean audioEnable, boolean videoEnable) {
+    //        INITIALIZE_AUDIO = audioEnable;
+    //        INITIALIZE_VIDEO = videoEnable;
+    //    }
+
 
 //    public void makeCall(IceCandidate iceCandidate) {
 //        peerConnection.createAnswer();
