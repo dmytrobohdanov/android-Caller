@@ -1,5 +1,6 @@
 package com.dmytro.caller;
 
+import android.app.Activity;
 import android.os.AsyncTask;
 import android.util.Log;
 
@@ -13,10 +14,16 @@ import java.net.URL;
 import java.util.Calendar;
 import java.util.Random;
 
+//import org.eclipse.jetty.websocket.client.WebSocketClient;
 
 
 public class GetID extends AsyncTask<Void, Void, String> {
     private final String LOG_TAG = this.getClass().getSimpleName();
+    private Activity activity;
+
+    public GetID(Activity activity) {
+        this.activity = activity;
+    }
 
     @Override
     protected String doInBackground(Void... params) {
@@ -33,13 +40,14 @@ public class GetID extends AsyncTask<Void, Void, String> {
     protected void onPostExecute(String result) {
         super.onPostExecute(result);
 
-    }
+
+}
 
     /**
      * Sending request to PeerJS for getting ID
      *
      * @param forUrl string with url for request
-     * @return JSON string responded from PeerJS
+     * @return //todo
      */
     private String sendRequestForResult(String forUrl) {
         URL url = null;
